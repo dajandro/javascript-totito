@@ -1,0 +1,54 @@
+/*
+  Daniel Orozco 13312
+  UVG
+  Sistemas y Tecnologias Web
+  2016
+*/
+.indicadores {
+  height: 190px;
+  position: relative; }
+
+#turno {
+  float: left;
+  padding-left: 15px; }
+
+#ganador {
+  float: right;
+  padding-right: 15px; }
+
+.viewport, button {
+  font-size: 40px; }
+
+button {
+  left: 50%;
+  margin-top: 50px;
+  position: fixed;
+  transform: translate(-50%); }
+
+table {
+  border-collapse: collapse;
+  border: 2px;
+  cellpadding: 100px;
+  height: 500px;
+  margin-top: 20px;
+  margin: auto;
+  table-layout: fixed;
+  width: 500px;
+  word-break: break-all; }
+
+table, td {
+  border: 3px solid black;
+  vertical-align: middle; }
+
+tr {
+  height: 33%; }
+
+img {
+  height: 95px;
+  width: 95px; }
+
+td > img {
+  padding-left: 20px; }
+
+#ganador > img {
+  padding-left: 20px; }
