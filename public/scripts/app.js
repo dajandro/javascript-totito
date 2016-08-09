@@ -12,84 +12,60 @@ state = 1: O
 
 // Modelo / estado
 var state = 0;
-var end = false;
-
-var viewportTurno = document.getElementById("turno");
-var viewportGanador = document.getElementById("ganador");
-var changeTrigger = document.getElementById("reset");
-
-var tablero = document.getElementById("tablero");
-var casillas = document.getElementsByClassName("casilla");
-
+var end = false
+var empate = false;
+var tiro = -1;
 var tableroMatrix = [[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]];
+var tableroImgs = [['', '', ''],['', '', ''],['', '', '']];
+var ganadorImg = '';
 
+var viewport = document.getElementById("viewport");
+
+function render(){
+  var html = '<div class="indicadores">';
+     html += '  <div class="viewport" id="turno">';
+     if(state == 0){
+      html += 'Turno<br><img src="images/x.png" id="turno-img">';
+     }
+     else{
+      html += 'Turno<br><img src="images/o.png" id="turno-img">';
+     }
+     html += "</div>"
+     if (empate == true)
+      html += '  <div class="viewport" id="ganador">Empate</div>';
+     else
+      html += '  <div class="viewport" id="ganador">Ganador<br>' + ganadorImg + '</div>';
+     html += '</div>';
+     html += '<div class="container">';
+     html += '  <table id="tablero">';
+     html += '    <tr>';
+     html += '      <td class="casilla" id="viewport-11">' + tableroImgs[0][0] + '</td>';
+     html += '      <td class="casilla" id="viewport-12">' + tableroImgs[0][1] + '</td>';
+     html += '      <td class="casilla" id="viewport-13">' + tableroImgs[0][2] + '</td>';
+     html += '    </tr>';
+     html += '    <tr>';
+     html += '      <td class="casilla" id="viewport-21">' + tableroImgs[1][0] + '</td>';
+     html += '      <td class="casilla" id="viewport-22">' + tableroImgs[1][1] + '</td>';
+     html += '      <td class="casilla" id="viewport-23">' + tableroImgs[1][2] + '</td>';
+     html += '    </tr>';
+     html += '    <tr>';
+     html += '      <td class="casilla" id="viewport-31">' + tableroImgs[2][0] + '</td>';
+     html += '      <td class="casilla" id="viewport-32">' + tableroImgs[2][1] + '</td>';
+     html += '      <td class="casilla" id="viewport-33">' + tableroImgs[2][2] + '</td>';
+     html += '    </tr>';
+     html += '  </table>';
+     html += '</div>';
+     html += '<button id="reset">Reset</button>';
+  return html;
+}
+
+viewport.innerHTML = render();
+
+changeTrigger = document.getElementById("reset");
+changeTrigger.addEventListener("click", reset);
+casillas = document.getElementsByClassName("casilla");
 for (i = 0; i < casillas.length; i++){
   casillas[i].addEventListener('click', casilla, false);
-}
-
-function casilla()
-{
-  var itemId = this.getAttribute("id");
-  var item = document.getElementById(itemId);
-  var itemImg = item.innerHTML;
-  var error = false;
-  // Verificar si la casilla esta ocupada o el juego ya llego al final
-  if ( (itemImg != '') || (end == true) )
-    error = true;
-  // Si no hay errores
-  if (! error)
-  {
-    // Se pone la imagen en la casilla
-    item.innerHTML = imagePlayer();
-    // Se pone el valor en la matriz de la casilla correspondiente
-    var fila = itemId.substring(9,10)-1;
-    var columna = itemId.substring(10,11)-1;
-    tableroMatrix[fila][columna] = state;
-    // Verificar si hay ganador
-    var win = ganador();
-    if (! win)
-    {
-      if (isTableroFull()){
-        viewportGanador.innerHTML = 'Empate';
-        end = true;
-      }
-      else{
-        // Se cambia de estado
-        if(state == 0){
-          state = 1;
-        }
-        else if(state == 1){
-          state = 0;  
-        }
-        // Aplicar renderTurno al estado correspondiente
-        viewportTurno.innerHTML = renderTurno();
-      }      
-    }
-    else
-    {
-      end = true;
-      viewportGanador.innerHTML = 'Ganador<br>' + imagePlayer();
-    }      
-  }
-}
-
-changeTrigger.addEventListener("click", reset);
-
-function reset(){
-  // Estado inicial
-  state = 0;
-  // Reiniciar matriz de juego
-  tableroMatrix = [[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]];
-  // Borrar ganador
-  viewportGanador.innerHTML = "Ganador";
-  // Aplicar renderTurno al estado correspondiente
-  viewportTurno.innerHTML = renderTurno();
-  // Reset flag
-  end = false;
-  // Reset viewport de las casillas del tablero
-  for (i = 0; i < casillas.length; i++){
-    casillas[i].innerHTML = "";
-  }
 }
 
 function imagePlayer(){
@@ -103,8 +79,75 @@ function imagePlayer(){
   return html;
 }
 
-function renderTurno(){  
-  return 'Turno<br>' + imagePlayer();
+function casilla()
+{  
+  var itemId = this.getAttribute("id");
+  var item = document.getElementById(itemId);
+  var itemImg = item.innerHTML;
+  var error = false;
+  // Verificar si la casilla esta ocupada o el juego ya llego al final
+  if ( (itemImg != '') || (end == true) )
+    error = true;
+  // Si no ha llegado al final
+  if (! error)
+  {    
+    // Se pone el valor en la matriz de la casilla correspondiente
+    var fila = itemId.substring(9,10)-1;
+    var columna = itemId.substring(10,11)-1;
+    tableroMatrix[fila][columna] = state;
+    // Se pone la imagen en la casilla
+    tableroImgs[fila][columna] = imagePlayer();
+    // Verificar si hay ganador
+    var win = ganador();
+    if (! win){
+      if (isTableroFull()){
+        empate = true;
+        end = true;
+      }
+      else{
+        // Se cambia de estado
+        if(state == 0){
+          state = 1;
+        }
+        else if(state == 1){
+          state = 0;  
+        }        
+      }      
+    }
+    else{
+      end = true;
+      ganadorImg = imagePlayer();
+    }    
+  }
+  viewport.innerHTML = render();
+  changeTrigger = document.getElementById("reset");
+  changeTrigger.addEventListener("click", reset);
+  casillas = document.getElementsByClassName("casilla");
+  for (i = 0; i < casillas.length; i++){
+    casillas[i].addEventListener('click', casilla, false);
+  }
+}
+
+//changeTrigger.addEventListener("click", reset);
+
+function reset(){
+  // Estado inicial
+  state = 0;
+  // Reiniciar matriz de juego
+  tableroMatrix = [[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]];
+  tableroImgs = [['', '', ''],['', '', ''],['', '', '']];
+  ganadorImg = '';
+  // Reset flags
+  end = false;
+  empate = false;
+  // Aplicar renderTurno al estado correspondiente
+  viewport.innerHTML = render();
+  changeTrigger = document.getElementById("reset");
+  changeTrigger.addEventListener("click", reset);
+  casillas = document.getElementsByClassName("casilla");
+  for (i = 0; i < casillas.length; i++){
+    casillas[i].addEventListener('click', casilla, false);
+  }  
 }
 
 function ganador(){
@@ -180,5 +223,3 @@ function isTableroFull()
   }
   return (tiros == 9);
 }
-
-viewportTurno.innerHTML = renderTurno();
